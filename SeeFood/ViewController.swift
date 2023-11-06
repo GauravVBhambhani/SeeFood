@@ -31,11 +31,44 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             clickedImage.image = usersImage
             
+            guard let ciimage = CIImage(image: usersImage) else {
+                fatalError("Could not convert UIImage to CIImage!")
+            }
+            detect(image: ciimage)
         }
         
         imagePicker.dismiss(animated: true)
         
+        
+        
     }
+    
+    // Now, after creating ciimage, we create a function that processes the ciimage and returns an interpretation of the image.
+    func detect(image: CIImage) {
+        
+        // VNCoreMLModel comes from Vision
+        guard let model = try? VNCoreMLModel(for: Inceptionv3().model) else {
+            fatalError("CoreML Model did not load!")
+        }
+        
+        let request = VNCoreMLRequest(model: model) { (request, error) in
+            guard let results = request.results as? [VNClassificationObservation] else {
+                fatalError("Model failed to process image!")
+            }
+            print(results)
+        }
+        
+        // create a handler whcih specifies which image we want to classify.
+        let handler = VNImageRequestHandler(ciImage: image)
+        
+        do {
+            try handler.perform([request])
+        } catch {
+            print(error)
+        }
+        
+    }
+    
     
     @IBAction func cameraTapped(_ sender: UIBarButtonItem) {
         present(imagePicker, animated: true)
