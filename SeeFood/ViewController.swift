@@ -55,7 +55,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             guard let results = request.results as? [VNClassificationObservation] else {
                 fatalError("Model failed to process image!")
             }
-            print(results)
+//            print(results)
+//            get first item with highest accuracy from result
+            if let firstResult = results.first {
+                if firstResult.identifier.contains("hotdog") {
+                    self.navigationItem.title = "Hotdog!"
+                } else {
+                    self.navigationItem.title = "Notdog!"
+                }
+            }
         }
         
         // create a handler whcih specifies which image we want to classify.
